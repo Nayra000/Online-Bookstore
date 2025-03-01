@@ -1,8 +1,11 @@
 const express = require('express');
 
-const { getBooks, createBook, uploadCoverImage } = require("../Controllers/bookController");
+const { getBooks, createBook,
+    uploadCoverImage, getBookById
+    , deleteBook, updateBook } = require("../Controllers/bookController");
 const authMiddleware = require("../Middlewares/authMiddleware");
-const bookValidator = require("../Validations/bookValidator");
+const validateCreatedBook = require("../Validations/createdBookValidator");
+const validateUpdatedBook = require("../Validations/updatedBookValidator");
 
 const router = express.Router();
 
@@ -11,12 +14,14 @@ router.use(authMiddleware.allowedTo("admin"));
 
 router.get("/", getBooks);
 
-router.post("/", uploadCoverImage.single("coverImage"), bookValidator.validateBook, createBook);
+router.post("/", uploadCoverImage.single("coverImage"),
+    validateCreatedBook.validateCreatedBook,
+    createBook);
 
-/* router.get("/:id",);
+router.get("/:id", getBookById);
 
-router.patch("/id:",);
+router.patch("/:id", validateUpdatedBook.validateUpdatedBook, updateBook);
 
-router.delete("/:id",); */
+router.delete("/:id", deleteBook);
 
 module.exports = router;

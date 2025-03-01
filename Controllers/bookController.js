@@ -34,6 +34,7 @@ exports.getBooks = asyncHandler(async (req, res, next) => {
     const books = await Books.find();
     if (!books.length) {
         next(new ApiError("No books found", 404));
+        return;
     }
     res.json({ length: books.length, books });
 
@@ -48,7 +49,6 @@ exports.createBook = asyncHandler(async (req, res, next) => {
         price: req.body.price,
         stock: req.body.stock,
         coverImage: req.file.filename,
-        reviews: req.body.reviews,
         image: req.file.filename,
         description: req.body.description,
     })
@@ -58,3 +58,37 @@ exports.createBook = asyncHandler(async (req, res, next) => {
     })
 
 })
+
+exports.deleteBook = asyncHandler(async (req, res, next) => {
+    const book = await Books.findByIdAndDelete(req.params.id);
+    console.log(book);
+    if (!book) {
+        next(new ApiError("No book found with that ID", 404));
+        return;
+    }
+    res.json({ message: "Book deleted successfully" });
+
+});
+
+exports.getBookById = asyncHandler(async (req, res, next) => {
+    const book = await Books.findById(req.params.id);
+    if (!book) {
+        next(new ApiError("No book found with that ID", 404));
+        return;
+    }
+    res.json(book);
+});
+
+exports.updateBook = asyncHandler(async (req, res, next) => {
+    console.log(req.body);
+    const book = await Books.findByIdAndUpdate(req.params.id, req.body, {
+        new: true,
+        runValidators: true
+    });
+    if (!book) {
+        next(new ApiError("No book found with that ID", 404));
+        return;
+    }
+    res.json(book);
+
+});

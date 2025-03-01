@@ -24,21 +24,8 @@ const bookSchema = new mongoose.Schema({
         min: 0
     },
     reviews: [{
-        user_id: {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: "User",
-            required: [true, "You must provide a user id for the review"]
-        },
-        rating: {
-            type: Number,
-            required: [true, "You must provide a rating"],
-            min: 1,
-            max: 5
-        },
-        comment: {
-            type: String,
-            required: [true, "You must provide a comment for the review"]
-        }
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Review"
     }
     ],
     image: {
@@ -50,7 +37,6 @@ const bookSchema = new mongoose.Schema({
 
         toJSON: { virtuals: true },
     });
-
 
 
 module.exports = mongoose.model("Book", bookSchema);
