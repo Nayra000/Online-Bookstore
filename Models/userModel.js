@@ -3,7 +3,6 @@ const bcrypt = require("bcryptjs");
 
 const userSchema = new mongoose.Schema(
   {
-    // - Users (name, email, password, role).
     name: {
       type: String,
       trim: true,
@@ -20,7 +19,20 @@ const userSchema = new mongoose.Schema(
         "Please enter a valid email address",
       ],
       lowercase: true,
+      unique: [true, "Email already exists"],
     },
+    cart: [
+      {
+        book: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "Book",
+        },
+        quantity: {
+          type: Number,
+          default: 1,
+        },
+      },
+    ],
     password: {
       type: String,
       required: [true, "password required"],
@@ -36,24 +48,38 @@ const userSchema = new mongoose.Schema(
       default: "user",
     },
   },
-
   {
     timestamps: true,
-
     toJSON: { virtuals: true },
+    toObject: { virtuals: true },
   }
 );
 
+// Hash password before saving
 userSchema.pre("save", async function (next) {
   if (!this.isModified("password")) return next();
-  // Hashing user password
   this.password = await bcrypt.hash(this.password, 12);
   next();
 });
 
+// Virtual property for totalCost
+userSchema.virtual("totalCost").get(function () {
+  if (!this.cart || this.cart.length === 0) return 0;
+  return this.cart.reduce((acc, item) => {
+    if (item.book && item.book.price) {
+      return acc + item.book.price * item.quantity;
+    }
+    return acc;
+  }, 0);
+});
+
 userSchema.set("toJSON", {
-  transform: (doc, { __v, password, ...rest }) => {
-    return rest;
+  transform: function (doc, ret) {
+    delete ret.password;
+    delete ret.__v;
+    ret.cart = ret.cart || [];
+    ret.totalCost = doc.totalCost;
+    return ret;
   },
 });
 
