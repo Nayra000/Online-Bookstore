@@ -1,8 +1,13 @@
-const express = require('express');
+const express = require("express");
 
-const { getBooks, createBook,
-    uploadCoverImage, getBookById
-    , deleteBook, updateBook } = require("../Controllers/bookController");
+const {
+  getBooks,
+  createBook,
+  uploadCoverImage,
+  getBookById,
+  deleteBook,
+  updateBook,
+} = require("../Controllers/bookController");
 const authMiddleware = require("../Middlewares/authMiddleware");
 const validateCreatedBook = require("../Validations/createdBookValidator");
 const validateUpdatedBook = require("../Validations/updatedBookValidator");
@@ -10,18 +15,25 @@ const validateUpdatedBook = require("../Validations/updatedBookValidator");
 const router = express.Router();
 
 router.use(authMiddleware.protect);
-router.use(authMiddleware.allowedTo("admin"));
 
-router.get("/", getBooks);
-
-router.post("/", uploadCoverImage.single("coverImage"),
+router
+  .route("/")
+  .get(authMiddleware.allowedTo("admin", "user"), getBooks)
+  .post(
+    authMiddleware.allowedTo("admin"),
+    uploadCoverImage.single("coverImage"),
     validateCreatedBook.validateCreatedBook,
-    createBook);
+    createBook
+  );
 
-router.get("/:id", getBookById);
-
-router.patch("/:id", validateUpdatedBook.validateUpdatedBook, updateBook);
-
-router.delete("/:id", deleteBook);
+router
+  .route("/:id")
+  .get(authMiddleware.allowedTo("admin", "user"), getBookById)
+  .patch(
+    authMiddleware.allowedTo("admin"),
+    validateUpdatedBook.validateUpdatedBook,
+    updateBook
+  )
+  .delete(authMiddleware.allowedTo("admin"), deleteBook);
 
 module.exports = router;
