@@ -65,7 +65,6 @@ userSchema.pre("save", async function (next) {
 // Virtual property for totalCost
 userSchema.virtual("totalCost").get(function () {
   if (!this.cart || this.cart.length === 0) return 0;
-
   return this.cart.reduce((acc, item) => {
     if (item.book && item.book.price) {
       return acc + item.book.price * item.quantity;
@@ -74,11 +73,12 @@ userSchema.virtual("totalCost").get(function () {
   }, 0);
 });
 
-// Ensure totalCost appears inside the cart when sending JSON
 userSchema.set("toJSON", {
   transform: function (doc, ret) {
+    delete ret.password;
+    delete ret.__v;
     ret.cart = ret.cart || [];
-    ret.totalCost = ret.totalCost || 0;
+    ret.totalCost = doc.totalCost;
     return ret;
   },
 });
