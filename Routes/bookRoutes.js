@@ -12,16 +12,18 @@ const router = express.Router();
 router.use(authMiddleware.protect);
 router.use(authMiddleware.allowedTo("admin"));
 
-router.get("/", getBooks);
+router.route("/")
+    .get(getBooks)
+    .post(uploadCoverImage.single("coverImage"),
+        validateCreatedBook.validateCreatedBook,
+        createBook);
 
-router.post("/", uploadCoverImage.single("coverImage"),
-    validateCreatedBook.validateCreatedBook,
-    createBook);
 
-router.get("/:id", getBookById);
-
-router.patch("/:id", validateUpdatedBook.validateUpdatedBook, updateBook);
-
-router.delete("/:id", deleteBook);
+router.route("/:id")
+    .get(getBookById)
+    .patch(uploadCoverImage.single("coverImage"),
+        validateUpdatedBook.validateUpdatedBook,
+        updateBook)
+    .delete(deleteBook);
 
 module.exports = router;
