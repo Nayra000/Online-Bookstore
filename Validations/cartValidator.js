@@ -4,7 +4,7 @@ const ApiError = require("../Utils/apiError");
 
 exports.validateAddToCart = [
     body() .custom((value, { req }) => {
-      console.log(typeof value);
+      // console.log(typeof value);
     if (
       !value ||
       typeof value !== "object" ||
