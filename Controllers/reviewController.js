@@ -1,72 +1,105 @@
 const Book = require("../models/bookModel");
+const Review = require("../models/reviewModel");
 const asyncHandler = require("express-async-handler");
-const Joi = require("joi");
+const { validationResult } = require("express-validator");
 
-// used Joi for validation; rating is between 1-5, and the comment is not more than 500 characters
-const reviewSchema = Joi.object({
-  rating: Joi.number().min(1).max(5),
-  comment: Joi.string().max(500)
-});
+// @desc    create a new review for a book
+// @route   post /api/v1/books/:bookId/reviews
+// @access  private
+exports.createReview = asyncHandler(async (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
+  }
 
-// merged the creation and updating functions in one; as the user can only have one review per book
-exports.createOrUpdateReview = asyncHandler(async (req, res) => {
   const { bookId } = req.params;
   const { rating, comment } = req.body;
   const userId = req.user._id;
 
-  // validate the input
-  const { error } = reviewSchema.validate({ rating, comment });
-  if (error) {
-    return res.status(400).json({ message: error.details[0].message });
-  }
-
-  // find the book
+  //check if the book exists
   const book = await Book.findById(bookId);
   if (!book) {
     return res.status(404).json({ message: "Book not found" });
   }
 
-  // check if user already made a review for this book
-  const existingReviewIndex = book.reviews.findIndex(r => r.user.toString() === userId.toString());
-
-  if (existingReviewIndex !== -1) {
-    // user can update his review
-    book.reviews[existingReviewIndex].rating = rating;
-    book.reviews[existingReviewIndex].comment = comment;
-    book.reviews[existingReviewIndex].updatedAt = Date.now();
-  } else {
-    // adding a new review
-    book.reviews.push({
-      user: userId,
-      rating,
-      comment,
-      createdAt: Date.now()
-    });
+  //check if user already reviewed this book
+  const existingReview = await Review.findOne({ book: bookId, user: userId });
+  if (existingReview) {
+    return res.status(400).json({ message: "You have already reviewed this book" });
   }
 
-  // recalculate the average rating
-  book.averageRating = (
-    book.reviews.reduce((acc, r) => acc + r.rating, 0) / book.reviews.length
-  ).toFixed(1);
+  //create a review
+  const review = await Review.create({
+    user: userId,
+    book: bookId,
+    rating,
+    comment
+  });
 
+  //add review reference to book
+  book.reviews.push(review._id);
   await book.save();
-  res.status(201).json({ message: "Review added/updated successfully", reviews: book.reviews });
+
+  res.status(201).json({ message: "Review added successfully", review });
 });
 
-// get the book; since reviews are embedded, they are fetched along with the book details
-exports.getBook = asyncHandler(async (req, res) => {
+// @desc    update an existing review
+// @route   put /api/v1/reviews/:reviewId
+// @access  private 
+exports.updateReview = asyncHandler(async (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
+  }
+
+  const { reviewId } = req.params;
+  const { rating, comment } = req.body;
+  const userId = req.user._id;
+
+  //find the review
+  const review = await Review.findById(reviewId);
+  if (!review) {
+    return res.status(404).json({ message: "Review not found" });
+  }
+
+  //check if the user owns the review
+  if (review.user.toString() !== userId.toString()) {
+    return res.status(403).json({ message: "You are not authorized to update this review" });
+  }
+
+  //update a review
+  review.rating = rating;
+  review.comment = comment;
+  review.updatedAt = Date.now();
+  await review.save();
+
+  res.status(200).json({ message: "Review updated successfully", review });
+});
+
+// @desc    get a book and its reviews
+// @route   get /api/v1/books/:bookId
+// @access  public
+exports.getBookWithReviews = asyncHandler(async (req, res) => {
   const { bookId } = req.params;
   const userId = req.user?._id;
+  const page = parseInt(req.query.page) || 1;
+  const limit = parseInt(req.query.limit) || 5;
+  const skip = (page - 1) * limit;
 
-  // find the book and populate the user field in reviews with name and email
-  const book = await Book.findById(bookId).populate("reviews.user", "name email");
+  //find the book
+  const book = await Book.findById(bookId).populate({
+    path: "reviews",
+    populate: { path: "user", select: "name email" },
+    options: { sort: { createdAt: -1 } }
+  });
+
   if (!book) {
     return res.status(404).json({ message: "Book not found" });
   }
 
   let reviews = book.reviews;
 
-  // display the logged-in user's review first for easier deletion/update
+  //show logged-in user's review first for faster update/delete
   if (userId) {
     const userReview = reviews.find(r => r.user._id.toString() === userId.toString());
     if (userReview) {
@@ -74,41 +107,43 @@ exports.getBook = asyncHandler(async (req, res) => {
     }
   }
 
-  res.status(200).json({ book, reviews });
+  //added pagination
+  const totalReviews = reviews.length;
+  const paginatedReviews = reviews.slice(skip, skip + limit);
+
+  res.status(200).json({
+    book,
+    reviews: paginatedReviews,
+    totalReviews,
+    page,
+    totalPages: Math.ceil(totalReviews / limit)
+  });
 });
 
-// deleting a review can only be done by admins or the user who made the review
+// @desc    delete a review
+// @route   delete /api/v1/reviews/:reviewId
+// @access  private (Review owner or Admin)
 exports.deleteReview = asyncHandler(async (req, res) => {
-  const { bookId, reviewId } = req.params;
+  const { reviewId } = req.params;
   const userId = req.user._id;
   const userRole = req.user.role;
 
-  // find the book
-  const book = await Book.findById(bookId);
-  if (!book) {
-    return res.status(404).json({ message: "Book not found" });
-  }
-
-  // get the review index
-  const reviewIndex = book.reviews.findIndex(r => r._id.toString() === reviewId);
-
-  if (reviewIndex === -1) {
+  //find a review
+  const review = await Review.findById(reviewId);
+  if (!review) {
     return res.status(404).json({ message: "Review not found" });
   }
 
-  // check if the user is an admin or the review's owner
-  if (book.reviews[reviewIndex].user.toString() !== userId.toString() && userRole !== "admin") {
+  //check if the user is the owner or an admin
+  if (review.user.toString() !== userId.toString() && userRole !== "admin") {
     return res.status(403).json({ message: "You are not authorized to delete this review" });
   }
 
-  // delete the review
-  book.reviews.splice(reviewIndex, 1);
+  //remove reference from the book
+  await Book.findByIdAndUpdate(review.book, { $pull: { reviews: review._id } });
 
-  // recalculate the average rating after review deletion
-  book.averageRating = book.reviews.length
-    ? (book.reviews.reduce((acc, r) => acc + r.rating, 0) / book.reviews.length).toFixed(1)
-    : 0;
+  //delete the review
+  await review.deleteOne();
 
-  await book.save();
-  res.status(200).json({ message: "Review deleted successfully", reviews: book.reviews });
+  res.status(200).json({ message: "Review deleted successfully" });
 });
