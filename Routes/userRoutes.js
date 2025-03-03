@@ -19,6 +19,7 @@ const {
   updateLoggedUserData,
   deleteLoggedUserData,
 } = require("../Controllers/userController");
+const { getMyOrders } = require("../Controllers/orderController");
 
 const authMiddleware = require("../Middlewares/authMiddleware");
 
@@ -26,12 +27,12 @@ const router = express.Router();
 
 router.use(authMiddleware.protect);
 
-// router.use(authMiddleware.allowedTo("user"));
+router.get("/getMe", authMiddleware.allowedTo("user"), getLoggedUserData, getUser);
+router.patch("/changeMyPassword", authMiddleware.allowedTo("user"), updateLoggedUserPassword);
+router.patch("/updateMe", authMiddleware.allowedTo("user"), updateLoggedUserValidator, updateLoggedUserData);
+router.delete("/deleteMe", authMiddleware.allowedTo("user"), deleteLoggedUserData);
+router.route("/myOrders").get(authMiddleware.allowedTo("user"), getMyOrders);
 
-router.get("/getMe", authMiddleware.allowedTo("user"),getLoggedUserData, getUser);
-router.patch("/changeMyPassword", authMiddleware.allowedTo("user"),updateLoggedUserPassword);
-router.patch("/updateMe",authMiddleware.allowedTo("user"), updateLoggedUserValidator, updateLoggedUserData);
-router.delete("/deleteMe",authMiddleware.allowedTo("user"), deleteLoggedUserData);
 
 // Admin
 router.use(authMiddleware.allowedTo("admin"));

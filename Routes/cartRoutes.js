@@ -17,7 +17,7 @@ const {
 
 const router = express.Router();
 
-router.use(authMiddleware.protect);
+router.use(authMiddleware.protect, authMiddleware.allowedTo("user"));
 
 router
   .route("/")
