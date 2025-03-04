@@ -87,7 +87,7 @@ const getOrders = async (userId, res, next) => {
     if (!userExists) {
         return next(new ApiError("❌ User does not exist", 404));
     }
-    
+
     const orders = await Order.find({ user: userId })
         .sort({ orderDate: -1 })
         .populate({
@@ -153,6 +153,11 @@ exports.createOrder = asyncHandler(async (req, res, next) => {
 
 exports.getAllOrders = asyncHandler(async (req, res, next) => {
     const orders = await Order.find()
+        .sort({ orderDate: -1 })
+        .populate({
+            path: "user",
+            select: "name email"
+        })
         .populate({
             path: 'books.book',
             select: 'title description author averageRating'
@@ -170,6 +175,10 @@ exports.getAllOrders = asyncHandler(async (req, res, next) => {
 exports.getOrderById = asyncHandler(async (req, res, next) => {
     const { id: orderId } = req.params;
     const order = await Order.findById(orderId)
+        .populate({
+            path: "user",
+            select: "name email"
+        })
         .populate({
             path: 'books.book',
             select: 'title description author averageRating'
