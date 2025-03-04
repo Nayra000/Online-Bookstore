@@ -5,7 +5,7 @@ const orderSchema = new Schema({
     user: {
         type: Types.ObjectId,
         ref: 'User',
-        required: true,
+        required: [true, "user required"],
         immutable: true
     },
     status: {
@@ -23,7 +23,7 @@ const orderSchema = new Schema({
     },
     books: {
         type: [bookOrderedSchema],
-        required: true
+        required: [true, "book required"],
     },
     discountAmount: {
         type: Number,
