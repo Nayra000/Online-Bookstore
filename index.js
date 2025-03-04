@@ -3,10 +3,12 @@ const dotenv = require("dotenv");
 const cors = require("cors");
 const morgan = require("morgan");
 const dbConnection = require("./Configs/Database");
+const cron = require("./Utils/cronJobs");
 const ApiError = require("./Utils/apiError");
 const globalError = require("./Middlewares/errorMidddleware");
 const mountRoutes = require("./Routes/index");
 const path = require("path");
+
 
 dotenv.config({ path: "config.env" });
 
