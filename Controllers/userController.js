@@ -10,7 +10,10 @@ exports.getUsers = asyncHandler(async (req, res, next) => {
   const limitValue = Number(limit) || 10;
   const skipValue = Number(skip) || 0;
 
-  const users = await User.find(filter).skip(skipValue).limit(limitValue);
+  const users = await User.find(filter)
+    .skip(skipValue)
+    .limit(limitValue)
+    .populate("cart.book", "title price");
   res.status(200).json({
     results: users.length,
     limit: limitValue,
@@ -21,7 +24,10 @@ exports.getUsers = asyncHandler(async (req, res, next) => {
 
 // @route   GET /api/v1/users/:id
 exports.getUser = asyncHandler(async (req, res, next) => {
-  const user = await User.findById(req.params.id);
+  const user = await User.findById(req.params.id).populate(
+    "cart.book",
+    "title price"
+  );
   if (!user) {
     return next(new ApiError(`No document for this id ${req.params.id}`, 404));
   }
