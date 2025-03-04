@@ -4,10 +4,10 @@ const bookOrderedSchema = require("./bookOrderedModel");
 const orderSchema = new Schema(
   {
     user: {
-      type: Types.ObjectId,
-      ref: "User",
-      required: true,
-      immutable: true,
+        type: Types.ObjectId,
+        ref: 'User',
+        required: [true, "user required"],
+        immutable: true
     },
     status: {
       type: String,
@@ -23,8 +23,10 @@ const orderSchema = new Schema(
       },
     },
     books: {
-      type: [bookOrderedSchema],
-      required: true,
+
+        type: [bookOrderedSchema],
+        required: [true, "book required"],
+
     },
     discountAmount: {
       type: Number,

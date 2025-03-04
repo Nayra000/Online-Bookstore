@@ -29,8 +29,12 @@ const userSchema = new mongoose.Schema(
         },
         quantity: {
           type: Number,
-          default: 1,
-        },
+          min: [1, '❌ Quantity must be at least 1'],
+          validate: {
+              validator: value => value % 1 === 0,
+              message: '❌ Quantity must be a positive integer'
+          }
+      },
       },
     ],
     cartUpdatedAt: {
@@ -68,7 +72,7 @@ userSchema.pre("save", async function (next) {
 
 // Virtual property for totalCost
 userSchema.virtual("totalCost").get(function () {
-  if (!this.cart || this.cart.length === 0) return 0;
+  if (!this.cart || this.cart.length === 0) return;
   return this.cart.reduce((acc, item) => {
     if (item.book && item.book.price) {
       return acc + item.book.price * item.quantity;
