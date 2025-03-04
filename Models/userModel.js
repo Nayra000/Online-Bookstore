@@ -33,6 +33,10 @@ const userSchema = new mongoose.Schema(
         },
       },
     ],
+    cartUpdatedAt: {
+      type: Date,
+      default: Date.now,
+    },
     password: {
       type: String,
       required: [true, "password required"],

@@ -5,7 +5,7 @@ const ApiError = require("../Utils/apiError");
 
 exports.addToCart = asyncHandler(async (req, res, next) => {
   const userId = req.user.id;
-  const cartItems = req.body; // Format: { "bookId": quantity, "bookId": quantity, ... }
+  const cartItems = req.body; // Format: { "bookId": quantity, ... }
 
   if (!cartItems || Object.keys(cartItems).length === 0) {
     return next(new ApiError("Cart cannot be empty.", 400));
@@ -21,9 +21,7 @@ exports.addToCart = asyncHandler(async (req, res, next) => {
 
   // Get user cart
   const user = await User.findById(userId);
-  if (!user) {
-    return next(new ApiError("User not found.", 404));
-  }
+  if (!user) return next(new ApiError("User not found.", 404));
 
   const cart = user.cart;
 
@@ -34,17 +32,15 @@ exports.addToCart = asyncHandler(async (req, res, next) => {
     const existingItem = cart.find((item) => item.book.toString() === bookId);
 
     if (existingItem) {
-      existingItem.quantity += quantity; // Increment quantity
+      existingItem.quantity += quantity;
     } else {
-      cart.push({ book: bookId, quantity }); // Add new book
+      cart.push({ book: bookId, quantity });
     }
   });
 
-  // Save the updated cart
-  user.cart = cart;
-  await user.save();
+  user.cartUpdatedAt = new Date();
 
-  // Populate cart with book details
+  await user.save();
   await user.populate("cart.book", "title price");
 
   res
@@ -52,10 +48,9 @@ exports.addToCart = asyncHandler(async (req, res, next) => {
     .json({ message: "Cart updated successfully.", cart: user.cart });
 });
 
-
 exports.updateCartItem = asyncHandler(async (req, res, next) => {
   const userId = req.user.id;
-  const cartUpdates = req.body; // Format: { "bookId": quantity, "bookId": quantity, ... }
+  const cartUpdates = req.body; // Format: { "bookId": quantity, ... }
 
   if (!cartUpdates || Object.keys(cartUpdates).length === 0) {
     return next(new ApiError("Cart update data is required.", 400));
@@ -64,7 +59,8 @@ exports.updateCartItem = asyncHandler(async (req, res, next) => {
   const user = await User.findById(userId);
   if (!user) return next(new ApiError("User not found.", 404));
 
-  // Iterate over the cart updates
+  let updated = false;
+
   Object.entries(cartUpdates).forEach(([bookId, quantity]) => {
     const bookIndex = user.cart.findIndex(
       (item) => item.book.toString() === bookId
@@ -72,12 +68,16 @@ exports.updateCartItem = asyncHandler(async (req, res, next) => {
 
     if (bookIndex !== -1) {
       if (quantity > 0) {
-        user.cart[bookIndex].quantity = quantity; // Update quantity
+        user.cart[bookIndex].quantity = quantity;
+        updated = true;
       } else {
-        user.cart.splice(bookIndex, 1); // Remove book if quantity is 0
+        user.cart.splice(bookIndex, 1);
+        updated = true;
       }
     }
   });
+
+  if (updated) user.cartUpdatedAt = new Date();
 
   await user.save();
   await user.populate("cart.book", "title price");
@@ -87,15 +87,13 @@ exports.updateCartItem = asyncHandler(async (req, res, next) => {
     .json({ message: "Cart updated successfully.", cart: user.cart });
 });
 
-
-
 exports.removeFromCart = asyncHandler(async (req, res, next) => {
   const userId = req.user.id;
-  const { id:bookId } = req.params;
+  const { id: bookId } = req.params;
 
   const user = await User.findByIdAndUpdate(
     userId,
-    { $pull: { cart: { book: bookId } } },
+    { $pull: { cart: { book: bookId } }, cartUpdatedAt: new Date() }, 
     { new: true }
   ).populate("cart.book", "title price");
 
@@ -103,7 +101,6 @@ exports.removeFromCart = asyncHandler(async (req, res, next) => {
 
   res.status(200).json({ message: "Book removed from cart.", cart: user.cart });
 });
-
 
 exports.viewCart = asyncHandler(async (req, res, next) => {
   const userId = req.user.id;
@@ -119,11 +116,13 @@ exports.clearCart = asyncHandler(async (req, res, next) => {
 
   const user = await User.findByIdAndUpdate(
     userId,
-    { cart: [] },
+    { cart: [], cartUpdatedAt: new Date() }, 
     { new: true }
   );
 
   if (!user) return next(new ApiError("User not found.", 404));
 
-  res.status(200).json({ message: "Cart cleared successfully.", cart: user.cart });
+  res
+    .status(200)
+    .json({ message: "Cart cleared successfully.", cart: user.cart });
 });
