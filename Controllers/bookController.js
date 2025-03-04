@@ -32,7 +32,10 @@ exports.uploadCoverImage = multer({
 });
 
 exports.getBooks = asyncHandler(async (req, res, next) => {
-    const books = await Books.find();
+    const { page = 1, limit = 10, ...filter } = req.query;
+    const limitNum = parseInt(limit);
+    const skipNum = (parseInt(page) - 1) * limitNum;
+    const books = await Books.find(filter).skip(skipNum).limit(limitNum);
     if (!books.length) {
         next(new ApiError("No books found", 404));
         return;
