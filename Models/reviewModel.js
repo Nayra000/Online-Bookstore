@@ -27,7 +27,7 @@ const reviewSchema = new mongoose.Schema(
         timestamps: true,
         toJSON: { virtuals: true },
         toObject: { virtuals: true },
-      }
+    }
 );
 
 module.exports = mongoose.model("Review", reviewSchema);
@@ -39,7 +39,7 @@ reviewSchema.statics.calculateAverageRating = async function (bookId) {
       {
         $group: {
           _id: "$book",
-          avgRating: { $avg: "$rating" },
+          averageRating: { $avg: "$rating" },
           numReviews: { $sum: 1 },
         },
       },
@@ -47,11 +47,14 @@ reviewSchema.statics.calculateAverageRating = async function (bookId) {
   
     if (stats.length > 0) {
       await Book.findByIdAndUpdate(bookId, {
-        avgRating: stats[0].avgRating,
+        averageRating: stats[0].averageRating,
         numReviews: stats[0].numReviews,
       });
     } else {
-      await Book.findByIdAndUpdate(bookId, { avgRating: 0, numReviews: 0 });
+      await Book.findByIdAndUpdate(bookId, { averageRating: 0, numReviews: 0 });
     }
   };
+  reviewSchema.post('save' ,async function(){
+    this.constructor.calculateAverageRating(this.book);
+})
   

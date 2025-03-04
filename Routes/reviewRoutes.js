@@ -1,16 +1,31 @@
 const express = require("express");
-const { createReview, updateReview, deleteReview } = require("../Controllers/reviewController");
-const { protect } = require("../middleware/authMiddleware");
+const { createReview, updateReview, deleteReview, getBookWithReviews, getAllReviews } = require("../Controllers/reviewController");
+const { protect, allowedTo } = require("../Middlewares/authMiddleware");
+const { createReviewValidator } = require("../Validations/reviewValidator");
 
 const router = express.Router();
+router.use(protect);
+/////////////////// get reviews 
+router.route("/")
+    .get(getAllReviews);
+    
+router.route("/:id")
+    .get(
+        getBookWithReviews
+    );
 
-//only logged in users can create a review
-router.post("/:bookId/reviews", protect, createReview);
+//only logged-in users can create a review (Done)
+router.post(
+    "/book/:id",
+    allowedTo("user"),
+    createReviewValidator,
+    createReview
+);
 
-//only the review owner can update the review
-router.put("/reviews/:reviewId", protect, updateReview);
 
-//review owner or admins can delete a review
-router.delete("/reviews/:reviewId", protect, deleteReview);
+router.route("/:id")
+    .patch(allowedTo("user"), updateReview)
+    .delete(allowedTo("user", "admin"), deleteReview);
+
 
 module.exports = router;

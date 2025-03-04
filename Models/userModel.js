@@ -64,7 +64,7 @@ userSchema.pre("save", async function (next) {
 
 // Virtual property for totalCost
 userSchema.virtual("totalCost").get(function () {
-  if (!this.cart || this.cart.length === 0) return 0;
+  if (!this.cart || this.cart.length === 0) return;
   return this.cart.reduce((acc, item) => {
     if (item.book && item.book.price) {
       return acc + item.book.price * item.quantity;

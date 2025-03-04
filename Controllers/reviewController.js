@@ -1,18 +1,21 @@
-const Book = require("../models/bookModel");
-const Review = require("../models/reviewModel");
+const Book = require("../Models/bookModel");
+const Review = require("../Models/reviewModel");
 const asyncHandler = require("express-async-handler");
 const { validationResult } = require("express-validator");
 
+exports.getAllReviews = asyncHandler(async (req, res) => {
+  const reviews = await Review.find();
+  if (reviews.length === 0) {
+    return res.status(404).json({ message: "No reviews found" });
+  }
+  res.status(200).json(reviews);
+});
+
 // @desc    create a new review for a book
-// @route   post /api/v1/books/:bookId/reviews
+// @route   POST /api/v1/books/:bookId/reviews
 // @access  private
 exports.createReview = asyncHandler(async (req, res) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return res.status(400).json({ errors: errors.array() });
-  }
-
-  const { bookId } = req.params;
+  const { id: bookId } = req.params;
   const { rating, comment } = req.body;
   const userId = req.user._id;
 
@@ -37,24 +40,19 @@ exports.createReview = asyncHandler(async (req, res) => {
   });
 
   //add review reference to book
-  book.reviews.push(review._id);
-  await book.save();
+  await Book.findByIdAndUpdate(bookId, { $push: { reviews: review._id } });
+  //update the average rating
+  // await review.constructor.calculateAverageRating(bookId);
 
   res.status(201).json({ message: "Review added successfully", review });
 });
 
 // @desc    update an existing review
-// @route   put /api/v1/reviews/:reviewId
+// @route   Patch /api/v1/reviews/:reviewId
 // @access  private 
 exports.updateReview = asyncHandler(async (req, res) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return res.status(400).json({ errors: errors.array() });
-  }
-
-  const { reviewId } = req.params;
+  const { id: reviewId } = req.params;
   const { rating, comment } = req.body;
-  const userId = req.user._id;
 
   //find the review
   const review = await Review.findById(reviewId);
@@ -62,88 +60,68 @@ exports.updateReview = asyncHandler(async (req, res) => {
     return res.status(404).json({ message: "Review not found" });
   }
 
-  //check if the user owns the review
-  if (review.user.toString() !== userId.toString()) {
-    return res.status(403).json({ message: "You are not authorized to update this review" });
-  }
-
   //update a review
-  review.rating = rating;
-  review.comment = comment;
-  review.updatedAt = Date.now();
+  if (rating !== undefined) review.rating = rating;
+  if (comment !== undefined) review.comment = comment;
   await review.save();
 
   res.status(200).json({ message: "Review updated successfully", review });
 });
 
-// @desc    get a book and its reviews
-// @route   get /api/v1/books/:bookId
-// @access  public
+// @desc    Get a book and its reviews
+// @route   GET /api/v1/books/:id/reviews
+// @access  Public
 exports.getBookWithReviews = asyncHandler(async (req, res) => {
-  const { bookId } = req.params;
-  const userId = req.user?._id;
+  const { id: bookId } = req.params;
+  const book = await Book.findById(bookId);
   const page = parseInt(req.query.page) || 1;
   const limit = parseInt(req.query.limit) || 5;
   const skip = (page - 1) * limit;
 
-  //find the book
-  const book = await Book.findById(bookId).populate({
-    path: "reviews",
-    populate: { path: "user", select: "name email" },
-    options: { sort: { createdAt: -1 } }
-  });
+  //get total review count for pagination
+  const totalReviews = await Review.countDocuments({ book: bookId });
 
-  if (!book) {
-    return res.status(404).json({ message: "Book not found" });
-  }
+  //get reviews with pagination
+  let reviews = await Review.find({ book: bookId })
+    .populate({ path: "user", select: "name email" })
+    .sort({ createdAt: -1 })
+    .skip(skip)
+    .limit(limit);
 
-  let reviews = book.reviews;
-
-  //show logged-in user's review first for faster update/delete
-  if (userId) {
-    const userReview = reviews.find(r => r.user._id.toString() === userId.toString());
-    if (userReview) {
-      reviews = [userReview, ...reviews.filter(r => r !== userReview)];
-    }
-  }
-
-  //added pagination
-  const totalReviews = reviews.length;
-  const paginatedReviews = reviews.slice(skip, skip + limit);
 
   res.status(200).json({
-    book,
-    reviews: paginatedReviews,
+    book: {
+      _id: book._id,
+      title: book.title,
+      author: book.author,
+      avgRating: book.averageRating || 0,
+      numReviews: book.reviews.length || 0,
+    },
+    reviews,
     totalReviews,
     page,
-    totalPages: Math.ceil(totalReviews / limit)
+    totalPages: Math.ceil(totalReviews / limit),
   });
 });
 
+
 // @desc    delete a review
-// @route   delete /api/v1/reviews/:reviewId
+// @route   DELETE /api/v1/reviews/:reviewId
 // @access  private (Review owner or Admin)
 exports.deleteReview = asyncHandler(async (req, res) => {
-  const { reviewId } = req.params;
-  const userId = req.user._id;
-  const userRole = req.user.role;
-
+  const { id: reviewId } = req.params;
   //find a review
   const review = await Review.findById(reviewId);
   if (!review) {
     return res.status(404).json({ message: "Review not found" });
   }
-
-  //check if the user is the owner or an admin
-  if (review.user.toString() !== userId.toString() && userRole !== "admin") {
-    return res.status(403).json({ message: "You are not authorized to delete this review" });
-  }
-
   //remove reference from the book
-  await Book.findByIdAndUpdate(review.book, { $pull: { reviews: review._id } });
-
-  //delete the review
-  await review.deleteOne();
-
+  await Review.findByIdAndDelete(reviewId);
+  await Book.updateOne(
+    { _id:review.book },
+    { $pull: { reviews: reviewId } }
+  );
+  //update the average rating
+  // await Review.calculateAverageRating(review.book);
   res.status(200).json({ message: "Review deleted successfully" });
 });
