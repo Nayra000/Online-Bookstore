@@ -35,7 +35,8 @@ const bookSchema = new mongoose.Schema({
     {
         timestamps: true,
 
-        toJSON: { virtuals: true },
+        toJSON: { virtuals: false }, // Exclude virtuals in JSON output
+        toObject: { virtuals: false } // Exclude virtuals in object output
     });
 
 

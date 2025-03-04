@@ -3,6 +3,7 @@ const asyncHandler = require("express-async-handler");
 const ApiError = require("../Utils/apiError");
 const multer = require("multer");
 const path = require("path");
+const fs = require("fs");
 
 
 
@@ -31,7 +32,10 @@ exports.uploadCoverImage = multer({
 });
 
 exports.getBooks = asyncHandler(async (req, res, next) => {
-    const books = await Books.find();
+    const { page = 1, limit = 10, ...filter } = req.query;
+    const limitNum = parseInt(limit);
+    const skipNum = (parseInt(page) - 1) * limitNum;
+    const books = await Books.find(filter).skip(skipNum).limit(limitNum);
     if (!books.length) {
         next(new ApiError("No books found", 404));
         return;
@@ -41,8 +45,6 @@ exports.getBooks = asyncHandler(async (req, res, next) => {
 });
 
 exports.createBook = asyncHandler(async (req, res, next) => {
-    console.log(req.body.author);
-    console.log(req.file);
     const book = await Books.create({
         title: req.body.title,
         author: req.body.author,
@@ -54,18 +56,17 @@ exports.createBook = asyncHandler(async (req, res, next) => {
     })
     res.status(201).json({
         book
-
     })
 
 })
 
 exports.deleteBook = asyncHandler(async (req, res, next) => {
     const book = await Books.findByIdAndDelete(req.params.id);
-    console.log(book);
     if (!book) {
         next(new ApiError("No book found with that ID", 404));
         return;
     }
+    deleteImage(book.image);
     res.json({ message: "Book deleted successfully" });
 
 });
@@ -80,15 +81,29 @@ exports.getBookById = asyncHandler(async (req, res, next) => {
 });
 
 exports.updateBook = asyncHandler(async (req, res, next) => {
-    console.log(req.body);
+    if (req.body.image) {
+        next(new ApiError("You can not rename the existing book cover", 400));
+        return;
+    }
     const book = await Books.findByIdAndUpdate(req.params.id, req.body, {
+        runValidators: true,
         new: true,
-        runValidators: true
     });
     if (!book) {
         next(new ApiError("No book found with that ID", 404));
         return;
     }
+    if (req.file) {
+        deleteImage(book.image);
+        book.image = req.file.filename;
+        await book.save();
+    }
     res.json(book);
 
 });
+
+const deleteImage = (image) => {
+    const imagePath = path.join(__dirname, '..', 'bookCovers', image);
+    fs.unlinkSync(imagePath);
+
+}
