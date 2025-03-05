@@ -8,7 +8,7 @@ exports.getAllReviews = asyncHandler(async (req, res) => {
   if (reviews.length === 0) {
     return res.status(404).json({ message: "No reviews found" });
   }
-  res.status(200).json({result:reviews.length,reviews});
+  res.status(200).json({ result: reviews.length, reviews });
 });
 
 exports.getUserReviews = asyncHandler(async (req, res) => {
@@ -17,7 +17,7 @@ exports.getUserReviews = asyncHandler(async (req, res) => {
   if (reviews.length === 0) {
     return res.status(404).json({ message: "No reviews found" });
   }
-  res.status(200).json({result: reviews.length,reviews});
+  res.status(200).json({ result: reviews.length, reviews });
 });
 
 // @desc    create a new review for a book
@@ -47,11 +47,6 @@ exports.createReview = asyncHandler(async (req, res) => {
     rating,
     comment
   });
-
-  //add review reference to book
-  // await Book.findByIdAndUpdate(bookId, { $push: { reviews: review._id } });
-  //update the average rating
-  // await review.constructor.calculateAverageRating(bookId);
 
   res.status(201).json({ message: "Review added successfully", review });
 });
@@ -119,18 +114,19 @@ exports.getBookWithReviews = asyncHandler(async (req, res) => {
 // @access  private (Review owner or Admin)
 exports.deleteReview = asyncHandler(async (req, res) => {
   const { id: reviewId } = req.params;
-  //find a review
+
+  // Find the review
   const review = await Review.findById(reviewId);
   if (!review) {
     return res.status(404).json({ message: "Review not found" });
   }
-  //remove reference from the book
-  await Review.findByIdAndDelete(reviewId);
-  await Book.updateOne(
-    { _id:review.book },
-    { $pull: { reviews: reviewId } }
-  );
-  //update the average rating
-  // await Review.calculateAverageRating(review.book);
+
+  // Check permissions
+  if (req.user.role !== "admin" && req.user._id.toString() !== review.user.toString()) {
+    return res.status(403).json({ message: "You are not authorized to delete this review" });
+  }
+  await review.deleteOne()
+  await Review.calculateAverageRating(review.book);
+
   res.status(200).json({ message: "Review deleted successfully" });
 });
