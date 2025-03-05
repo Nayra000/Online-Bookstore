@@ -51,7 +51,7 @@ npm install
 
 ## Deployment
 
-🚀 The application is live at: [Your Deployment Link](https://online-bookstore-ezp2.onrender.com)
+🚀 The application is deployed at: [Online Bookstore](https://online-bookstore-ezp2.onrender.com)
 
 ## 📊 Entity Relationship Diagram (ERD)
 

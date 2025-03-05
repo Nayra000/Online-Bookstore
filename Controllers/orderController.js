@@ -215,22 +215,32 @@ exports.updateOrderStatus = asyncHandler(async (req, res, next) => {
         path: "books.book",
         select: "title",
       })
+      .populate({
+        path: "user",
+        select: "name email",
+      })
       .exec();
-    if (!order) throw new ApiError("❌ Order not found", 404);
+    if (!order) next(new ApiError("❌ Order not found", 404));
 
     if (status === "canceled")
       await updateBookStock(order.books, session, "canceled");
 
-    const StatusUpdateHtml = getStatusUpdateEmail(req.user.name, order);
-    await sendEmail({
-      email: req.user.email,
-      subject: `Order #${order._id} Status Update`,
-      message: StatusUpdateHtml,
-    });
-
     await session.commitTransaction();
 
     res.status(200).json(order);
+
+    setImmediate(async () => {
+      try {
+        const statusUpdateHtml = getStatusUpdateEmail(order.user.name, order);
+        await sendEmail({
+          email: order.user.email,
+          subject: `Order #${order._id} Status Update`,
+          message: statusUpdateHtml,
+        });
+      } catch (err) {
+        console.error("Email sending failed:", err);
+      }
+    });
   } catch (error) {
     await session.abortTransaction();
     next(new ApiError(error.message, 404));
