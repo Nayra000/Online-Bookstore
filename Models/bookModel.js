@@ -23,11 +23,6 @@ const bookSchema = new mongoose.Schema({
         required: [true, "You must provide a stock number for the book"],
         min: 0
     },
-    // reviews: [{
-    //     type: mongoose.Schema.Types.ObjectId,
-    //     ref: "Review"
-    // }
-    // ],
     image: {
         type: String,
     },
@@ -46,6 +41,7 @@ const bookSchema = new mongoose.Schema({
         timestamps: true,
         toJSON: { virtuals: true },
         toObject: { virtuals: true },
+
     });
 
 bookSchema.virtual('reviews', {
