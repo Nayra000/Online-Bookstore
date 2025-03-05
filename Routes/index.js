@@ -7,6 +7,7 @@ const authRouter = require("./authRoutes");
 const orderRouter = require("./orderRoutes");
 const bookRouter = require("./bookRoutes");
 const cartRoutes = require("./cartRoutes");
+const bookingRouter = require("./onlinePaymentRoutes");
 const reviewRouter = require("./reviewRoutes");
 
 const mountRoutes = (app) => {
@@ -16,7 +17,7 @@ const mountRoutes = (app) => {
   app.use("/api/v1/books", bookRouter);
   app.use("/api/v1/cart", cartRoutes);
   app.use("/api/v1/reviews", reviewRouter);
-
+  app.use("/api/v1/booking", bookingRouter);
 };
 
 module.exports = mountRoutes;

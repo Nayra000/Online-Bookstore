@@ -7,6 +7,8 @@ const cron = require("./Utils/cronJobs");
 const ApiError = require("./Utils/apiError");
 const globalError = require("./Middlewares/errorMidddleware");
 const mountRoutes = require("./Routes/index");
+const { webhookCheckout } = require("./Controllers/onlinePaymentController");
+
 const path = require("path");
 
 
@@ -15,6 +17,12 @@ dotenv.config({ path: "config.env" });
 dbConnection();
 
 const app = express();
+
+app.post(
+  "/webhook-checkout",
+  express.raw({ type: "application/json" }),
+  webhookCheckout
+);
 
 app.use(express.json());
 app.options("*", cors());
