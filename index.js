@@ -7,6 +7,9 @@ const cron = require("./Utils/cronJobs");
 const ApiError = require("./Utils/apiError");
 const globalError = require("./Middlewares/errorMidddleware");
 const mountRoutes = require("./Routes/index");
+const path = require("path");
+
+
 dotenv.config({ path: "config.env" });
 
 dbConnection();
@@ -15,6 +18,7 @@ const app = express();
 
 app.use(express.json());
 app.options("*", cors());
+app.use(express.static(path.join(__dirname, "bookCovers")));
 
 if (process.env.NODE_ENV === "development") {
   app.use(morgan("dev"));
