@@ -10,7 +10,6 @@ const { createOrder } = require("./orderController");
 // @route   GET /api/v1/orders/online-payment/
 // @access  Protected/User
 exports.checkoutSession = asyncHandler(async (req, res, next) => {
-  const shippingPrice = 20;
 
   // 1) Get user's cart with book details
   const cart = await User.findById(req.user._id)
@@ -26,13 +25,7 @@ exports.checkoutSession = asyncHandler(async (req, res, next) => {
 
   // Ensure totalCost is defined
   const cartPrice = cart.totalCost || 0;
-  const totalOrderPrice = cartPrice + shippingPrice;
-
-  //   // Convert cart books to an array of IDs
-  //   const cartItemsIds = cart.cart
-  //     .map((item) => item.book._id.toString())
-  //     .join(",");
-
+    
   // ✅ Create line items for Stripe
   const lineItems = cart.cart.map((item) => ({
     price_data: {
@@ -46,20 +39,6 @@ exports.checkoutSession = asyncHandler(async (req, res, next) => {
     quantity: item.quantity,
   }));
 
-  lineItems.push({
-    price_data: {
-      currency: "egp",
-      product_data: {
-        name: "Shipping",
-        images: [
-          "https://firebasestorage.googleapis.com/v0/b/clinic-square.appspot.com/o/uploads%2Fdownload.png?alt=media&token=7c49907c-780d-4788-8111-f4ca30488139",
-        ],
-      },
-      unit_amount: shippingPrice * 100,
-    },
-    quantity: 1,
-  });
-
   // 3) Create Stripe checkout session
   const session = await stripe.checkout.sessions.create({
     payment_method_types: ["card"],
@@ -72,7 +51,7 @@ exports.checkoutSession = asyncHandler(async (req, res, next) => {
       "host"
     )}/api/v1/orders/payment-rejected`,
     customer_email: req.user.email,
-    client_reference_id: req.user._id,
+    client_reference_id:req.user.id,
   });
 
   // 4) Send session to response
