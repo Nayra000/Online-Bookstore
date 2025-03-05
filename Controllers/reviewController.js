@@ -8,7 +8,16 @@ exports.getAllReviews = asyncHandler(async (req, res) => {
   if (reviews.length === 0) {
     return res.status(404).json({ message: "No reviews found" });
   }
-  res.status(200).json(reviews);
+  res.status(200).json({result:reviews.length,reviews});
+});
+
+exports.getUserReviews = asyncHandler(async (req, res) => {
+  const userId = req.user._id;
+  const reviews = await Review.find({ user: userId });
+  if (reviews.length === 0) {
+    return res.status(404).json({ message: "No reviews found" });
+  }
+  res.status(200).json({result: reviews.length,reviews});
 });
 
 // @desc    create a new review for a book
@@ -40,7 +49,7 @@ exports.createReview = asyncHandler(async (req, res) => {
   });
 
   //add review reference to book
-  await Book.findByIdAndUpdate(bookId, { $push: { reviews: review._id } });
+  // await Book.findByIdAndUpdate(bookId, { $push: { reviews: review._id } });
   //update the average rating
   // await review.constructor.calculateAverageRating(bookId);
 
@@ -48,7 +57,7 @@ exports.createReview = asyncHandler(async (req, res) => {
 });
 
 // @desc    update an existing review
-// @route   Patch /api/v1/reviews/:reviewId
+// @route   PATCH /api/v1/reviews/:reviewId
 // @access  private 
 exports.updateReview = asyncHandler(async (req, res) => {
   const { id: reviewId } = req.params;

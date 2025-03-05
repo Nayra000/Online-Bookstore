@@ -7,7 +7,8 @@ const router = express.Router();
 router.use(protect);
 /////////////////// get reviews 
 router.route("/")
-    .get(getAllReviews);
+    .get(allowedTo("admin"),getAllReviews);
+    
     
 router.route("/:id")
     .get(

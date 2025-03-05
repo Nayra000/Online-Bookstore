@@ -31,7 +31,10 @@ exports.uploadCoverImage = multer({
 });
 
 exports.getBooks = asyncHandler(async (req, res, next) => {
-    const books = await Books.find();
+    const books = await Books.find()  .populate({
+        path: "reviews",
+        select: "rating comment user -book",
+    })
     if (!books.length) {
         next(new ApiError("No books found", 404));
         return;

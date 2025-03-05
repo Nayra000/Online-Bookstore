@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const Book = require("./bookModel");
 
 const reviewSchema = new mongoose.Schema(
     {
@@ -30,31 +31,34 @@ const reviewSchema = new mongoose.Schema(
     }
 );
 
-module.exports = mongoose.model("Review", reviewSchema);
 
 //function to calculate average rating
 reviewSchema.statics.calculateAverageRating = async function (bookId) {
-    const stats = await this.aggregate([
-      { $match: { book: bookId } },
-      {
-        $group: {
-          _id: "$book",
-          averageRating: { $avg: "$rating" },
-          numReviews: { $sum: 1 },
-        },
+  const stats = await this.aggregate([
+    { $match: { book: bookId } },
+    {
+      $group: {
+        _id: "$book",
+        averageRating: { $avg: "$rating" },
+        numReviews: { $sum: 1 },
       },
-    ]);
+    },
+  ]);
   
-    if (stats.length > 0) {
-      await Book.findByIdAndUpdate(bookId, {
-        averageRating: stats[0].averageRating,
-        numReviews: stats[0].numReviews,
-      });
-    } else {
-      await Book.findByIdAndUpdate(bookId, { averageRating: 0, numReviews: 0 });
-    }
-  };
-  reviewSchema.post('save' ,async function(){
-    this.constructor.calculateAverageRating(this.book);
+  if (stats.length > 0) {
+    await Book.findByIdAndUpdate(bookId, {
+      averageRating: stats[0].averageRating,
+      numReviews: stats[0].numReviews,
+    });
+  } else {
+    await Book.findByIdAndUpdate(bookId, { averageRating: 0, numReviews: 0 });
+  }
+};
+reviewSchema.post('save' ,async function(){
+  await this.constructor.calculateAverageRating(this.book);
 })
-  
+reviewSchema.post('remove', async function () {
+  await this.constructor.calculateAverageRating(this.book);
+});
+
+module.exports = mongoose.model("Review", reviewSchema);
