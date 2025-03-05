@@ -10,7 +10,6 @@ const { createOrder } = require("./orderController");
 // @route   GET /api/v1/orders/online-payment/
 // @access  Protected/User
 exports.checkoutSession = asyncHandler(async (req, res, next) => {
-
   // 1) Get user's cart with book details
   const cart = await User.findById(req.user._id)
     .select("cart totalCost")
@@ -25,7 +24,7 @@ exports.checkoutSession = asyncHandler(async (req, res, next) => {
 
   // Ensure totalCost is defined
   const cartPrice = cart.totalCost || 0;
-    
+
   // ✅ Create line items for Stripe
   const lineItems = cart.cart.map((item) => ({
     price_data: {
@@ -46,12 +45,12 @@ exports.checkoutSession = asyncHandler(async (req, res, next) => {
     mode: "payment",
     success_url: `${req.protocol}://${req.get(
       "host"
-    )}/api/v1/orders/payment-successfully`,
+    )}/api/v1/booking/payment-successfully`,
     cancel_url: `${req.protocol}://${req.get(
       "host"
-    )}/api/v1/orders/payment-rejected`,
+    )}/api/v1/booking/payment-rejected`,
     customer_email: req.user.email,
-    client_reference_id:req.user.id,
+    client_reference_id: req.user.id,
   });
 
   // 4) Send session to response
