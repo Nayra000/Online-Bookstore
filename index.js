@@ -9,6 +9,11 @@ require("./Utils/cronJobs");
 const ApiError = require("./Utils/apiError");
 const globalError = require("./Middlewares/errorMidddleware");
 const mountRoutes = require("./Routes/index");
+const { webhookCheckout } = require("./Controllers/onlinePaymentController");
+
+const path = require("path");
+
+
 const logger = require('./logger');
 
 dotenv.config({ path: "config.env" });
@@ -18,8 +23,15 @@ dbConnection();
 
 const app = express();
 
+app.post(
+  "/webhook-checkout",
+  express.raw({ type: "application/json" }),
+  webhookCheckout
+);
+
 app.use(express.json());
 app.options("*", cors());
+app.use(express.static(path.join(__dirname, "bookCovers")));
 
 const logFileStream = fs.createWriteStream(path.join(__dirname, 'access.log'),
   { flags: 'a' });

@@ -42,13 +42,17 @@ npm install
 
 ## 📜 Scripts
 
-| Command               | Description |
-|-----------------------|-------------|
-| `npm run start:dev`   | Runs in development mode  🔧 (auto-restarts with nodemon). |
-| `npm run start:prod`  | Runs in production mode 🚀 with `{HOSTNAME}`. |
-| `npm run lint`        | Checks for code quality issues.🛡️ |
-| `npm run fix`         | Fixes linting issues automatically.🔄 
+| Command              | Description                                               |
+| -------------------- | --------------------------------------------------------- |
+| `npm run start:dev`  | Runs in development mode 🔧 (auto-restarts with nodemon). |
+| `npm run start:prod` | Runs in production mode 🚀 with `{HOSTNAME}`.             |
+| `npm run lint`       | Checks for code quality issues.🛡️                         |
+| `npm run fix`        | Fixes linting issues automatically.🔄                     |
 
-### 📊 Entity Relationship Diagram (ERD)
+## Deployment
+
+🚀 The application is deployed at: [Online Bookstore](https://online-bookstore-ezp2.onrender.com)
+
+## 📊 Entity Relationship Diagram (ERD)
 
 ![ERD](./Utils/ERD.png)

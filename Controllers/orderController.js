@@ -81,18 +81,11 @@ const updateBookStock = async (userCart, session, status) => {
   }
 };
 
-const createNewOrder = async (
-  user,
-  booksOrdered,
-  paymentMethod,
-  discountAmount,
-  session
-) => {
+const createNewOrder = async (user, booksOrdered, paymentMethod, session) => {
   const newOrder = await new Order({
     user: user._id,
     books: booksOrdered,
     paymentMethod,
-    discountAmount,
   }).save({ session });
 
   const populatedOrder = await Order.findById(newOrder._id)
@@ -120,12 +113,9 @@ const getOrders = async (userId) => {
 
   return orders;
 };
-
 exports.createOrder = asyncHandler(async (req, res, next) => {
   const userId = req.user._id;
-  const { paymentMethod = "cash"} = req.body;
-  // const discountAmount =req.body; 
-  
+  const { paymentMethod = "cash" } = req.body;
   const session = await Order.startSession();
   session.startTransaction();
 
@@ -139,11 +129,11 @@ exports.createOrder = asyncHandler(async (req, res, next) => {
 
     checkStockAvailability(user.cart, booksMap);
     const booksOrdered = prepareBooksOrdered(user.cart, booksMap);
+
     const newOrder = await createNewOrder(
       user,
       booksOrdered,
       paymentMethod,
-      discountAmount,
       session
     );
 
@@ -165,7 +155,7 @@ exports.createOrder = asyncHandler(async (req, res, next) => {
     res.status(201).json(newOrder);
   } catch (error) {
     await session.abortTransaction();
-    next(error);
+    next(new ApiError(error.message, 400));
   } finally {
     session.endSession();
   }
@@ -175,7 +165,7 @@ exports.getAllOrders = asyncHandler(async (req, res, next) => {
   const orders = await Order.find()
     .populate("books.book", "title description author averageRating")
     .exec();
-  if (!orders.length) throw new ApiError("❌ Orders not found", 404);
+  if (!orders.length) next(new ApiError("❌ Orders not found", 404));
   res.status(200).json({ result: orders.length, data: orders });
 });
 
@@ -184,12 +174,13 @@ exports.getOrderById = asyncHandler(async (req, res, next) => {
   const order = await Order.findById(orderId)
     .populate("books.book", "title description author averageRating")
     .exec();
-  if (!order) throw new ApiError("❌ Order not found", 404);
+  if (!order) next(new ApiError("❌ Order not found", 404));
   res.status(200).json(order);
 });
 
 exports.getOrdersByUserId = asyncHandler(async (req, res, next) => {
   const orders = await getOrders(req.params.id);
+  if (!orders) next(new ApiError("Order not found", 404));
   res.status(200).json({
     result: orders.length,
     message: "📦 Orders retrieved successfully!",
@@ -199,6 +190,7 @@ exports.getOrdersByUserId = asyncHandler(async (req, res, next) => {
 
 exports.getMyOrders = asyncHandler(async (req, res, next) => {
   const orders = await getOrders(req.user._id);
+  if (!orders) next(new ApiError("Order not found", 404));
   res.status(200).json({
     result: orders.length,
     message: "📦 Orders retrieved successfully!",
@@ -223,25 +215,35 @@ exports.updateOrderStatus = asyncHandler(async (req, res, next) => {
         path: "books.book",
         select: "title",
       })
+      .populate({
+        path: "user",
+        select: "name email",
+      })
       .exec();
-    if (!order) throw new ApiError("❌ Order not found", 404);
+    if (!order) next(new ApiError("❌ Order not found", 404));
 
     if (status === "canceled")
       await updateBookStock(order.books, session, "canceled");
 
-    const StatusUpdateHtml = getStatusUpdateEmail(req.user.name, order);
-    await sendEmail({
-      email: req.user.email,
-      subject: `Order #${order._id} Status Update`,
-      message: StatusUpdateHtml,
-    });
-
     await session.commitTransaction();
 
     res.status(200).json(order);
+
+    setImmediate(async () => {
+      try {
+        const statusUpdateHtml = getStatusUpdateEmail(order.user.name, order);
+        await sendEmail({
+          email: order.user.email,
+          subject: `Order #${order._id} Status Update`,
+          message: statusUpdateHtml,
+        });
+      } catch (err) {
+        console.error("Email sending failed:", err);
+      }
+    });
   } catch (error) {
     await session.abortTransaction();
-    next(error);
+    next(new ApiError(error.message, 404));
   } finally {
     session.endSession();
   }

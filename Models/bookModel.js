@@ -23,21 +23,31 @@ const bookSchema = new mongoose.Schema({
         required: [true, "You must provide a stock number for the book"],
         min: 0
     },
-    reviews: [{
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Review"
-    }
-    ],
     image: {
         type: String,
-    }
+    },
+    averageRating: {
+        type: Number,
+        min: [1, 'Rating must be above or equal 1.0'],
+        max: [5, 'Rating must be below or equal 5.0'],
+    },
+    numReviews: {
+        type: Number,
+        default: 0,
+    },
 },
+
     {
         timestamps: true,
+        toJSON: { virtuals: true },
+        toObject: { virtuals: true },
 
-        toJSON: { virtuals: false }, // Exclude virtuals in JSON output
-        toObject: { virtuals: false } // Exclude virtuals in object output
     });
 
+bookSchema.virtual('reviews', {
+    ref: 'Review',
+    foreignField: 'book',
+    localField: '_id',
+});
 
 module.exports = mongoose.model("Book", bookSchema);
