@@ -20,7 +20,7 @@ const {
   deleteLoggedUserData,
 } = require("../Controllers/userController");
 const { getMyOrders } = require("../Controllers/orderController");
-
+const { getUserReviews } = require("../Controllers/reviewController");
 const authMiddleware = require("../Middlewares/authMiddleware");
 
 const router = express.Router();
@@ -32,7 +32,7 @@ router.patch("/changeMyPassword", authMiddleware.allowedTo("user"), updateLogged
 router.patch("/updateMe", authMiddleware.allowedTo("user"), updateLoggedUserValidator, updateLoggedUserData);
 router.delete("/deleteMe", authMiddleware.allowedTo("user"), deleteLoggedUserData);
 router.route("/myOrders").get(authMiddleware.allowedTo("user"), getMyOrders);
-
+router.route("/myReviews").get(authMiddleware.allowedTo("user"), getUserReviews);
 
 // Admin
 router.use(authMiddleware.allowedTo("admin"));
