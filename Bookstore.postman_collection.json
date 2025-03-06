@@ -1,0 +1,1246 @@
+{
+	"info": {
+		"_postman_id": "5abd0cf2-7829-4679-b4f1-d4b93814d9eb",
+		"name": "Bookstore",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "42697412",
+		"_collection_link": "https://iti777.postman.co/workspace/ITI~70791fb7-586b-473b-801d-06df7a3a4709/collection/42697412-5abd0cf2-7829-4679-b4f1-d4b93814d9eb?action=share&source=collection_link&creator=42697412"
+	},
+	"item": [
+		{
+			"name": "Admin",
+			"item": [
+				{
+					"name": "User",
+					"item": [
+						{
+							"name": "Get users",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{url}}/users?role=user",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"users"
+									],
+									"query": [
+										{
+											"key": "role",
+											"value": "user"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get a user",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{url}}/users/67c0eb7e7ea8a4ae3d887583",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"users",
+										"67c0eb7e7ea8a4ae3d887583"
+									],
+									"query": [
+										{
+											"key": "role",
+											"value": "user",
+											"disabled": true
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Delete user",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "{{url}}/users/",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"users",
+										""
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "update User",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "PATCH",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"email\":\"SalmaYasser@gmail.com\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{url}}/users/67c0ea82c0c213adc183fe07",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"users",
+										"67c0ea82c0c213adc183fe07"
+									]
+								}
+							},
+							"response": []
+						}
+					],
+					"auth": {
+						"type": "bearer",
+						"bearer": [
+							{
+								"key": "token",
+								"value": "{{token}}",
+								"type": "string"
+							}
+						]
+					},
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"packages": {},
+								"exec": [
+									""
+								]
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"packages": {},
+								"exec": [
+									""
+								]
+							}
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "Authentication",
+			"item": [
+				{
+					"name": "Signup",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.environment.set(\"token\", pm.response.json().token);"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\":\"salma yasser\",\n    \"email\":\"salma@gmail.com\",\n    \"password\":\"password123\",\n    \"passwordConfirm\":\"password123\"\n\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/auth/signup",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"auth",
+								"signup"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Signup as user",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"name\":\"Nayra Ashraf\",\n    \"email\":\"youssefnayra26@gmail.com\",\n    \"password\":\"password123\",\n    \"passwordConfirm\":\"password123\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{url}}/auth/signup",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"auth",
+										"signup"
+									]
+								}
+							},
+							"_postman_previewlanguage": null,
+							"header": null,
+							"cookie": [],
+							"body": null
+						},
+						{
+							"name": "Signup as admin",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"name\":\"Admin\",\n    \"email\":\"admin1@gmail.com\",\n    \"password\":\"admin123\",\n    \"passwordConfirm\":\"admi123\",\n    \"role\":\"admin\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{url}}/auth/signup",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"auth",
+										"signup"
+									]
+								}
+							},
+							"_postman_previewlanguage": null,
+							"header": null,
+							"cookie": [],
+							"body": null
+						}
+					]
+				},
+				{
+					"name": "Login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"",
+									"pm.environment.set(\"token\", pm.response.json().token);"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\":\"admin@gmail.com\",\n    \"password\":\"admin123\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/auth/login",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"auth",
+								"login"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Login as user",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"email\":\"yassersalma56@gmail.com\",\n    \"password\":\"password123\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{url}}/auth/login",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"auth",
+										"login"
+									]
+								}
+							},
+							"_postman_previewlanguage": null,
+							"header": null,
+							"cookie": [],
+							"body": null
+						},
+						{
+							"name": "Login as admin",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"email\":\"admin@gmail.com\",\n    \"password\":\"admin123\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{url}}/auth/login",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"auth",
+										"login"
+									]
+								}
+							},
+							"_postman_previewlanguage": null,
+							"header": null,
+							"cookie": [],
+							"body": null
+						}
+					]
+				},
+				{
+					"name": "logout",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.environment.set(\"token\", pm.response.json().token);"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/auth/logout",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"auth",
+								"logout"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"packages": {},
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"packages": {},
+						"exec": [
+							""
+						]
+					}
+				}
+			]
+		},
+		{
+			"name": "Logged User",
+			"item": [
+				{
+					"name": "Cart",
+					"item": [
+						{
+							"name": "get my cart",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{url}}/cart",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"cart"
+									]
+								},
+								"description": "### Get Cart\n\nThis endpoint retrieves the contents of the logged user cart.\n\n#### Request\n\nNo request body is required for this endpoint.\n\n- Method: GET\n    \n- URL: `{{url}}/cart`\n    \n\n#### Response\n\nThe response will be in the JSON format and will have the following schema:\n\n``` json\n{\n    \"cart\": [\n        {\n            \"book\": {\n                \"_id\": \"string\",\n                \"title\": \"string\",\n                \"price\": 0,\n                \"id\": \"string\"\n            },\n            \"quantity\": 0,\n            \"_id\": \"string\"\n        }\n    ],\n    \"totalCost\": 0\n}\n\n ```\n\nThe `cart` array contains objects with details of the books in the cart, including the book's ID, title, price, and quantity. The `totalCost` field represents the total cost of the items in the cart.\n\n- Status: 200\n    \n- Content-Type: application/json"
+							},
+							"response": []
+						},
+						{
+							"name": "Add to cart",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    // \"67c75c3d8b30e78b48418cad\":2,\n    \"67c75c108b30e78b48418caa\":1\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{url}}/cart",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"cart"
+									]
+								},
+								"description": "### Add Cart Items\n\nThis endpoint is used to add the items in the cart.\n\n#### Request Body\n\n- The request should be a JSON object with key-value pairs representing the book IDs and their corresponding quantities to be updated in the cart.\n    \n\nExample:\n\n``` json\n{\n    \"67c45626f408b1a906e241eb\": 2,\n    \"67c45e5f687397ab012f1ad0\": 1\n}\n\n ```\n\n#### Response\n\n- Status: 200\n    \n- Content-Type: application/json\n    \n\nThe response will include a message and an array of updated cart items, where each item contains details about the book (including ID, title, and price) and the updated quantity.\n\nExample:\n\n``` json\n{\n    \"message\": \"Cart updated successfully\",\n    \"cart\": [\n        {\n            \"book\": {\n                \"_id\": \"67c45e5f687397ab012f1ad0\",\n                \"title\": \"Sample Boook\",\n                \"price\": 100,\n                \"id\": \"67c45e5f687397ab012f1ad0\"\n            },\n            \"quantity\": 2,\n            \"_id\": \"67c46618a95f2e8a6fdc744a\"\n        },\n        {\n            \"book\": {\n                \"_id\": \"67c45626f408b1a906e241eb\",\n                \"title\": \"Data Base1\",\n                \"price\": 100,\n                \"id\": \"67c45626f408b1a906e241eb\"\n            },\n            \"quantity\": 1,\n            \"_id\": \"67c46a17c8dbf09efe1b24f7\"\n        }\n    ]\n}\n\n ```"
+							},
+							"response": []
+						},
+						{
+							"name": "update my cart",
+							"request": {
+								"method": "PATCH",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"67c45626f408b1a906e241eb\":0, //remove the book \n   \"67c45e5f687397ab012f1ad0\":1\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{url}}/cart",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"cart"
+									]
+								},
+								"description": "### Update Cart Items\n\nThis endpoint is used to update the items in the cart.\n\n#### Request Body\n\n- The request should be a JSON object with key-value pairs representing the book IDs and their corresponding quantities to be updated in the cart.\n    \n\nExample:\n\n``` json\n{\n    \"67c45626f408b1a906e241eb\": 0,\n    \"67c45e5f687397ab012f1ad0\": 1\n}\n\n ```\n\n#### Response\n\n- Status: 200\n    \n- Content-Type: application/json\n    \n\nThe response will include a message and an array of updated cart items, where each item contains details about the book (including ID, title, and price) and the updated quantity.\n\nExample:\n\n``` json\n{\n    \"message\": \"\",\n    \"cart\": [\n        {\n            \"book\": {\n                \"_id\": \"\",\n                \"title\": \"\",\n                \"price\": 0,\n                \"id\": \"\"\n            },\n            \"quantity\": 0,\n            \"_id\": \"\"\n        }\n    ]\n}\n\n ```"
+							},
+							"response": []
+						},
+						{
+							"name": "remove  book",
+							"request": {
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "{{url}}/cart/book/67c46a17c8dbf09efe1b24f7",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"cart",
+										"book",
+										"67c46a17c8dbf09efe1b24f7"
+									]
+								},
+								"description": "### Delete Book from Cart\n\nThis endpoint is used to remove a specific book from the user's cart by sending the book id in the param.\n\n#### Request Body\n\n- No request body is required for this endpoint.\n    \n\n#### Response\n\n- The response will not contain a body, but will include a status code to indicate the success or failure of the deletion."
+							},
+							"response": []
+						},
+						{
+							"name": "clear my cart",
+							"request": {
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "{{url}}/cart/clear",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"cart",
+										"clear"
+									]
+								},
+								"description": "This endpoint sends an HTTP DELETE request to clear the cart for the current logged user.\n\n### Response\n\nThe response of this request is a JSON schema describing the structure of the data returned after clearing the cart. The schema will outline the possible keys and their data types that can be expected in the response."
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "profile",
+					"item": [
+						{
+							"name": "Get me",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{url}}/users/getMe",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"users",
+										"getMe"
+									],
+									"query": [
+										{
+											"key": "role",
+											"value": "user",
+											"disabled": true
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Delete user",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "{{url}}/users/deleteMe",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"users",
+										"deleteMe"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "update User",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "PATCH",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"email\":\"yassersalma56@gmail.com\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{url}}/users/updateMe",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"users",
+										"updateMe"
+									]
+								}
+							},
+							"response": [
+								{
+									"name": "Editing Role (failed)",
+									"originalRequest": {
+										"method": "PATCH",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"role\":\"admin\"\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{url}}/users/updateMe",
+											"host": [
+												"{{url}}"
+											],
+											"path": [
+												"users",
+												"updateMe"
+											]
+										}
+									},
+									"_postman_previewlanguage": null,
+									"header": null,
+									"cookie": [],
+									"body": null
+								},
+								{
+									"name": "Editing email",
+									"originalRequest": {
+										"method": "PATCH",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"email\":\"Salma@gmail.com\"\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{url}}/users/updateMe",
+											"host": [
+												"{{url}}"
+											],
+											"path": [
+												"users",
+												"updateMe"
+											]
+										}
+									},
+									"_postman_previewlanguage": null,
+									"header": null,
+									"cookie": [],
+									"body": null
+								}
+							]
+						},
+						{
+							"name": "change my password",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "PATCH",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"password\":\"password123\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{url}}/users/changeMyPassword",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"users",
+										"changeMyPassword"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Orders",
+					"item": [
+						{
+							"name": "My Orders",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{url}}/users/myOrders",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"users",
+										"myOrders"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Create Order (Cash)",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"url": {
+									"raw": "{{url}}/orders/",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"orders",
+										""
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Create Order (Visa)",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"url": {
+									"raw": "{{url}}/orders/online-payment",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"orders",
+										"online-payment"
+									]
+								},
+								"description": "The HTTP POST request to `/orders/online-payment` is used to process online payments for orders. The request and response bodies are as follows:\n\n### Request Body\n\n- N/A\n    \n\n### Response Body\n\nThe response is in JSON format and represents the session details for the online payment. It includes various attributes such as session ID, adaptive pricing, billing address collection, customer details, payment status, and total details. The response can be documented as a JSON schema for further reference."
+							},
+							"response": []
+						},
+						{
+							"name": "cancel my order",
+							"request": {
+								"method": "PATCH",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"status\": \"canceled\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{url}}/orders/67c608e3ba1dc046f63a786e",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"orders",
+										"67c608e3ba1dc046f63a786e"
+									]
+								}
+							},
+							"response": [
+								{
+									"name": "For user",
+									"originalRequest": {
+										"method": "PATCH",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n    \"status\": \"canceled\"\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{url}}/orders/67c74213643e8be9d6c1aea9",
+											"host": [
+												"{{url}}"
+											],
+											"path": [
+												"orders",
+												"67c74213643e8be9d6c1aea9"
+											]
+										}
+									},
+									"_postman_previewlanguage": null,
+									"header": null,
+									"cookie": [],
+									"body": null
+								}
+							]
+						}
+					]
+				},
+				{
+					"name": "Reviews",
+					"item": [
+						{
+							"name": "Add Review",
+							"request": {
+								"method": "POST",
+								"header": []
+							},
+							"response": []
+						},
+						{
+							"name": "Get My Reviews",
+							"request": {
+								"method": "GET",
+								"header": []
+							},
+							"response": []
+						},
+						{
+							"name": "Update Review",
+							"request": {
+								"method": "PATCH",
+								"header": []
+							},
+							"response": []
+						},
+						{
+							"name": "Delete Review",
+							"request": {
+								"method": "DELETE",
+								"header": []
+							},
+							"response": []
+						}
+					]
+				}
+			],
+			"auth": {
+				"type": "bearer",
+				"bearer": [
+					{
+						"key": "token",
+						"value": "{{token}}",
+						"type": "string"
+					}
+				]
+			},
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"packages": {},
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"packages": {},
+						"exec": [
+							""
+						]
+					}
+				}
+			]
+		},
+		{
+			"name": "Books",
+			"item": [
+				{
+					"name": "Get Books",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/books",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"books"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Book",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "coverImage",
+									"type": "file",
+									"src": "/home/salma/Downloads/images.jpeg"
+								},
+								{
+									"key": "title",
+									"value": "Lost Island",
+									"type": "text"
+								},
+								{
+									"key": "author",
+									"value": "John smith",
+									"type": "text"
+								},
+								{
+									"key": "description",
+									"value": "A thrilling mystery novel set on a deserted island.",
+									"type": "text"
+								},
+								{
+									"key": "stock",
+									"value": "10",
+									"type": "text"
+								},
+								{
+									"key": "price",
+									"value": "250",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{url}}/books/",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"books",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Book By ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/books/67c45626f408b1a906e241eb",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"books",
+								"67c45626f408b1a906e241eb"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Book",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/books/67c45626f408b1a906e241eb",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"books",
+								"67c45626f408b1a906e241eb"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Book",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "title",
+									"value": "Algorithms",
+									"type": "text"
+								},
+								{
+									"key": "coverImage",
+									"type": "file",
+									"src": "/D:/ITI/HTML5/Css3/Css3/imagesTask/imagesTask/grass.png",
+									"disabled": true
+								},
+								{
+									"key": "image",
+									"value": "lll",
+									"type": "text",
+									"disabled": true
+								}
+							]
+						},
+						"url": {
+							"raw": "{{url}}/books/67c45626f408b1a906e241eb",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"books",
+								"67c45626f408b1a906e241eb"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Orders",
+			"item": [
+				{
+					"name": "Update Status",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    // \"status\": \"delivered\"\r\n    \"status\": \"out for delivery\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/orders/67c608e3ba1dc046f63a786e",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"orders",
+								"67c608e3ba1dc046f63a786e"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get  Order by Id",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/orders/67c608e3ba1dc046f63a786e",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"orders",
+								"67c608e3ba1dc046f63a786e"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get User's Orders",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/orders/user/67c0ea82c0c213adc183fe07",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"orders",
+								"user",
+								"67c0ea82c0c213adc183fe07"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Orders",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/orders/",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"orders",
+								""
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Reviews",
+			"item": [
+				{
+					"name": "Get Reviews",
+					"request": {
+						"method": "GET",
+						"header": []
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Review",
+					"request": {
+						"method": "DELETE",
+						"header": []
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{token}}",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	]
+}
