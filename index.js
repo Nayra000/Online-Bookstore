@@ -11,10 +11,7 @@ const globalError = require("./Middlewares/errorMidddleware");
 const mountRoutes = require("./Routes/index");
 const logger = require('./logger');
 const { webhookCheckout } = require("./Controllers/onlinePaymentController");
-const path = require("path");
 
-
-const logger = require('./logger');
 
 dotenv.config({ path: "config.env" });
 
