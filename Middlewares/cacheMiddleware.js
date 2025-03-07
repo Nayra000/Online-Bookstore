@@ -12,3 +12,14 @@ const redisClient = require('../Configs/CachingDB');
 
     next();
 };
+
+exports.cacheBookById = async (req, res, next) => {
+    const id = req.params.id;
+    const cachedData = await redisClient.get(`book:${id}`);
+
+    if (cachedData) {
+        return res.json(JSON.parse(cachedData));
+    }
+
+    next();
+}

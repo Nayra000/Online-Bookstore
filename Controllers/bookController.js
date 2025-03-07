@@ -32,7 +32,7 @@ exports.uploadCoverImage = multer({
 });
 
 exports.getBooks = asyncHandler(async (req, res, next) => {
-    const books = await Books.find()  .populate({
+    const books = await Books.find().populate({
         path: "reviews",
         select: "rating comment user -book",
     })
@@ -61,7 +61,14 @@ exports.createBook = asyncHandler(async (req, res, next) => {
         image: req.file.filename,
         description: req.body.description,
     })
-    await redisClient.del('books');
+
+    // Invalidate cached book list
+    await redisClient.del("books");
+
+    // Cache the newly created book
+    await redisClient.set(`book:${book._id}`, JSON.stringify(book), "EX", 3600);
+
+
     res.status(201).json({
         book
 
@@ -76,22 +83,27 @@ exports.deleteBook = asyncHandler(async (req, res, next) => {
         next(new ApiError("No book found with that ID", 404));
         return;
     }
-    await redisClient.del('books');
+  
+    await redisClient.del("books");
+    
+    await redisClient.del(`book:${book._id}`);
+    
     res.json({ message: "Book deleted successfully" });
 
 });
 
 exports.getBookById = asyncHandler(async (req, res, next) => {
+
     const book = await Books.findById(req.params.id);
     if (!book) {
         next(new ApiError("No book found with that ID", 404));
         return;
     }
+    await redisClient.set(`book:${req.params.id}`, JSON.stringify(book), "EX", 3600);
     res.json(book);
 });
 
 exports.updateBook = asyncHandler(async (req, res, next) => {
-    console.log(req.body);
     const book = await Books.findByIdAndUpdate(req.params.id, req.body, {
         new: true,
         runValidators: true
@@ -100,7 +112,12 @@ exports.updateBook = asyncHandler(async (req, res, next) => {
         next(new ApiError("No book found with that ID", 404));
         return;
     }
-    await redisClient.del('books');
+   
+    await redisClient.del("books");
+
+    
+    await redisClient.set(`book:${book._id}`, JSON.stringify(book), "EX", 3600);
+
     res.json(book);
 
 });

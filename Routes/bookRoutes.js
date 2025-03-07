@@ -1,5 +1,5 @@
 const express = require("express");
-const {cacheBooks} = require("../Middlewares/cacheMiddleware")
+const {cacheBooks ,cacheBookById} = require("../Middlewares/cacheMiddleware")
 const {
     getBooks,
     createBook,
@@ -29,7 +29,7 @@ router
 
 router
     .route("/:id")
-    .get(authMiddleware.allowedTo("admin", "user"), getBookById)
+    .get(authMiddleware.allowedTo("admin", "user"),cacheBookById, getBookById)
     .patch(
         authMiddleware.allowedTo("admin"),
         validateUpdatedBook.validateUpdatedBook,
