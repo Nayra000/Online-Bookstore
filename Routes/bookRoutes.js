@@ -1,5 +1,5 @@
 const express = require("express");
-
+const {cacheBooks} = require("../Middlewares/cacheMiddleware")
 const {
     getBooks,
     createBook,
@@ -8,6 +8,7 @@ const {
     deleteBook,
     updateBook,
 } = require("../Controllers/bookController");
+
 const authMiddleware = require("../Middlewares/authMiddleware");
 const validateCreatedBook = require("../Validations/createdBookValidator");
 const validateUpdatedBook = require("../Validations/updatedBookValidator");
@@ -18,7 +19,7 @@ router.use(authMiddleware.protect);
 
 router
     .route("/")
-    .get(authMiddleware.allowedTo("admin", "user"), getBooks)
+    .get(authMiddleware.allowedTo("admin", "user"),cacheBooks ,getBooks)
     .post(
         authMiddleware.allowedTo("admin"),
         uploadCoverImage.single("coverImage"),

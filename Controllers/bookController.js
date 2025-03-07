@@ -1,4 +1,5 @@
 const Books = require("./../Models/bookModel");
+const redisClient = require("../Configs/CachingDB");
 const asyncHandler = require("express-async-handler");
 const ApiError = require("../Utils/apiError");
 const multer = require("multer");
@@ -39,13 +40,18 @@ exports.getBooks = asyncHandler(async (req, res, next) => {
         next(new ApiError("No books found", 404));
         return;
     }
+    await redisClient.set('books', JSON.stringify({
+        length: books.length,
+        books
+    }
+    ), "EX", 3600);
+
     res.json({ length: books.length, books });
 
 });
 
 exports.createBook = asyncHandler(async (req, res, next) => {
-    console.log(req.body.author);
-    console.log(req.file);
+
     const book = await Books.create({
         title: req.body.title,
         author: req.body.author,
@@ -55,6 +61,7 @@ exports.createBook = asyncHandler(async (req, res, next) => {
         image: req.file.filename,
         description: req.body.description,
     })
+    await redisClient.del('books');
     res.status(201).json({
         book
 
@@ -64,11 +71,12 @@ exports.createBook = asyncHandler(async (req, res, next) => {
 
 exports.deleteBook = asyncHandler(async (req, res, next) => {
     const book = await Books.findByIdAndDelete(req.params.id);
-    console.log(book);
+
     if (!book) {
         next(new ApiError("No book found with that ID", 404));
         return;
     }
+    await redisClient.del('books');
     res.json({ message: "Book deleted successfully" });
 
 });
@@ -92,6 +100,7 @@ exports.updateBook = asyncHandler(async (req, res, next) => {
         next(new ApiError("No book found with that ID", 404));
         return;
     }
+    await redisClient.del('books');
     res.json(book);
 
 });
