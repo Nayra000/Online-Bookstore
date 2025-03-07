@@ -11,8 +11,6 @@ const globalError = require("./Middlewares/errorMidddleware");
 const mountRoutes = require("./Routes/index");
 const { webhookCheckout } = require("./Controllers/onlinePaymentController");
 
-const path = require("path");
-
 
 const logger = require('./logger');
 
@@ -33,14 +31,15 @@ app.use(express.json());
 app.options("*", cors());
 app.use(express.static(path.join(__dirname, "bookCovers")));
 
-const logFileStream = fs.createWriteStream(path.join(__dirname, 'access.log'),
+const logFileStream = fs.createWriteStream(path.join(__dirname, "logs", "access.log"),
   { flags: 'a' });
 
 
 if (process.env.NODE_ENV === "development") {
-  app.use(morgan('dev', { stream: logFileStream }));
+  morgan.format("customFormat", ':date[iso] | :method :url | Status: :status | :response-time ms | IP: :remote-addr');
+  app.use(morgan("customFormat", { stream: logFileStream }));
   app.use(morgan("dev"));
-  logger.info(`node:${process.env.NODE_ENV}`);
+  logger("app").info(`node:${process.env.NODE_ENV}`);
 }
 
 // Mout Routes using function
@@ -55,23 +54,23 @@ app.all("*", (req, res, next) => {
 app.use(globalError);
 
 process.on("uncaughtException", (error) => {
-  logger.error(error.message);
+  logger("error").error(error.message);
   server.close(() => {
-    logger.info("shutting down....");
+    logger("app").info("shutting down....");
     setTimeout(() => process.exit(1), 500);
   })
 });
 // Handle rejections outside express
 process.on("unhandledRejection", (error) => {
-  logger.error(error.message);
+  logger("error").error(error.message);
   server.close(() => {
-    logger.info("shutting down....");
+    logger("app").info("shutting down....");
     setTimeout(() => process.exit(1), 500);
   })
 });
 
 const PORT = process.env.PORT;
 const server = app.listen(PORT, () => {
-  logger.info(`Server is running on port ${PORT}`);
+  logger("app").info(`Server is running on port ${PORT}`);
 });
 module.exports = server;

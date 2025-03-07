@@ -4,7 +4,7 @@ const logger = require("../logger");
 
 // Schedule a job to run every day at midnight
 cron.schedule("0 0 * * *", async () => {
-  logger.info("🕒 Running cart cleanup...");
+  logger("app").info("🕒 Running cart cleanup...");
 
   const twoDaysAgo = new Date();
   twoDaysAgo.setDate(twoDaysAgo.getDate() - 2);
@@ -14,10 +14,10 @@ cron.schedule("0 0 * * *", async () => {
     { $set: { cart: [], cartUpdatedAt: Date.now() } }
   );
 
-  logger.info(`🧹 Cleared carts for ${result.modifiedCount} users.`);
+  logger("app").info(`🧹 Cleared carts for ${result.modifiedCount} users.`);
 });
 
-logger.info("🕒 Cart cleanup cron job scheduled.");
+logger("app").info("🕒 Cart cleanup cron job scheduled.");
 
 
 module.exports = cron;
