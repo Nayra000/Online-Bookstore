@@ -8,7 +8,8 @@
     "start:dev": "nodemon index.js",
     "start:prod": "NODE_ENV=production BASE_URL={HOSTNAME} node  index.js",
     "lint": "eslint",
-    "fix": "eslint --fix"
+    "fix": "eslint --fix",
+    "connect": "node ./Utils/adminSocket.js"
   },
   "repository": {
     "type": "git",
@@ -28,6 +29,7 @@
     "express": "^4.21.2",
     "express-async-handler": "^1.2.0",
     "express-validator": "^7.2.1",
+    "http": "^0.0.1-security",
     "joi": "^17.13.3",
     "jsonwebtoken": "^9.0.2",
     "mongo": "^0.1.0",
@@ -37,6 +39,8 @@
     "node-cron": "^3.0.3",
     "nodemailer": "^6.10.0",
     "redis": "^4.7.0",
+    "socket.io": "^4.8.1",
+    "socket.io-client": "^4.8.1",
     "stripe": "^17.7.0",
     "winston": "^3.17.0"
   },
