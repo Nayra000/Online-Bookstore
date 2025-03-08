@@ -13,7 +13,11 @@ The **Online Bookstore** is a web-based e-commerce platform where users can brow
 - 📦 **Order Placement**: Place orders and track purchase history.
 - 💳 **Payment Gateway Integration** _(optional)_.
 - 🛠️ **Admin Panel**: Manage books, orders, and users.
-
+- 🚀 **Caching Data**: Use Redis to store frequently accessed data for faster retrieval.
+- ☁️ **Cloudinary Integration**: Upload and manage book images efficiently.
+- 🔔 **Real-Time Notifications**: WebSockets notify admins when a new order is placed.
+- 📩 **Email Notifications**: Send automated emails when users register, place an order, or when order status changes.
+- 📜 **Application Logging**: Log system states and events using Winston & Morgan.
 ---
 
 ## 🛠️ Technologies Used
@@ -23,6 +27,12 @@ The **Online Bookstore** is a web-based e-commerce platform where users can brow
 - **Authentication**: JSON Web Token (JWT)
 - **Package Manager**: npm
 - **Development Tools**: Nodemon, ESLint
+- **Caching**: Redis
+- **Real-Time Communication**: WebSockets
+- **payment Processing**: Stripe
+- **Logging**: Winston & Morgan
+- **Email Service**: Nodemailer
+- **Cloud Storage**: Cloudinary
 
 ---
 
@@ -48,6 +58,8 @@ npm install
 | `npm run start:prod` | Runs in production mode 🚀 with `{HOSTNAME}`.             |
 | `npm run lint`       | Checks for code quality issues.🛡️                         |
 | `npm run fix`        | Fixes linting issues automatically.🔄                     |
+| `npm run connect `   | to run the admin web socket as client                     |
+
 
 ## Deployment
 

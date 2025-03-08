@@ -8,6 +8,8 @@ const {
   getReceiptEmail,
   getStatusUpdateEmail,
 } = require("../Utils/mailFormat");
+const logger = require("../logger.js");
+const { getSocket } = require("../socket.js");
 
 const validateUserAndCart = async (userId, session) => {
   const user = await User.findById(userId).session(session).exec();
@@ -88,14 +90,12 @@ const createNewOrder = async (user, booksOrdered, paymentMethod, session) => {
     paymentMethod,
   }).save({ session });
 
-  const populatedOrder = await Order.findById(newOrder._id)
-    .populate({
-      path: "books.book",
-      select: "title", // Ensure only title is fetched
-    })
-    .session(session);
+  await newOrder.populate({
+    path: "books.book",
+    select: "title",
+  });
 
-  return populatedOrder;
+  return newOrder;
 };
 
 const getOrders = async (userId) => {
@@ -113,6 +113,7 @@ const getOrders = async (userId) => {
 
   return orders;
 };
+
 exports.createOrder = asyncHandler(async (req, res, next) => {
   const userId = req.user._id;
   const { paymentMethod = "cash" } = req.body;
@@ -151,8 +152,18 @@ exports.createOrder = asyncHandler(async (req, res, next) => {
 
     await newOrder.save({ session });
 
+    const io = getSocket();
+    if (io) {
+      io.emit("order_created", newOrder);
+      logger("socket").info("📦 A new order has been placed!");
+    } else {
+      logger("socket").warn(
+        "⚠️ Attempted to emit an event, but Socket.io is not initialized."
+      );
+    }
     await session.commitTransaction();
     res.status(201).json(newOrder);
+    
   } catch (error) {
     await session.abortTransaction();
     next(new ApiError(error.message, 400));
