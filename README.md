@@ -78,7 +78,7 @@ These test cards work only in **Stripe's test mode** and cannot be used for real
 
 ## Deployment
 
-🚀 The application is deployed at: [Online Bookstore](https://online-bookstore-ezp2.onrender.com)
+🚀 The application is deployed on aws ec2 with Ip: (http://3.90.67.177:3000/)
 
 ## 📊 Entity Relationship Diagram (ERD)
 
