@@ -34,6 +34,7 @@ The **Online Bookstore** is a web-based e-commerce platform where users can brow
 - **Logging**: Winston & Morgan
 - **Email Service**: Nodemailer
 - **Cloud Storage**: Cloudinary
+- **Deployment**: AWS ec2 instance
 
 ---
 
