@@ -2,16 +2,14 @@ volumes:
   node_modules:
     driver: local
 
-
-version: '3.8'
+version: "3.8"
 services:
   redis:
     image: redis
     ports:
       - "6380:6379"
   app:
-    container_name: online-bookstore
-    build: .
+    image: salmayasser5/online-bookstore
     depends_on:
       - redis
     environment:
