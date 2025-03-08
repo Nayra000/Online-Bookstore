@@ -816,7 +816,7 @@
 										"online-payment"
 									]
 								},
-								"description": "The HTTP POST request to `/orders/online-payment` is used to process online payments for orders. The request and response bodies are as follows:\n\n### Request Body\n\n- N/A\n    \n\n### Response Body\n\nThe response is in JSON format and represents the session details for the online payment. It includes various attributes such as session ID, adaptive pricing, billing address collection, customer details, payment status, and total details. The response can be documented as a JSON schema for further reference."
+								"description": "The HTTP POST request to `/orders/online-payment` is used to process online payments for orders. The request and response bodies are as follows:\n\n### Request Body\n\n- N/A\n    \n\n### Response Body\n\nThe response is in JSON format and represents the session details for the online payment. It includes various attributes such as session ID, adaptive pricing, billing address collection, customer details, payment status, and total details. The response can be documented as a JSON schema for further reference.\n\n### **Use any of these test cards to simulate a payment.**\n\nPayment succeeds  \n4242 4242 4242 4242\n\nPayment requires authentication  \n4000 0025 0000 3155\n\nPayment is declined  \n4000 0000 0000 9995"
 							},
 							"response": []
 						},
@@ -982,7 +982,7 @@
 								{
 									"key": "coverImage",
 									"type": "file",
-									"src": "/home/salma/Downloads/images.jpeg"
+									"src": "/home/nayra/Pictures/Screenshot from 2025-02-28 18-22-20.png"
 								},
 								{
 									"key": "title",
@@ -1030,13 +1030,13 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{url}}/books/67c45626f408b1a906e241eb",
+							"raw": "{{url}}/books/67cb5fe95abf771e2bf52e9c",
 							"host": [
 								"{{url}}"
 							],
 							"path": [
 								"books",
-								"67c45626f408b1a906e241eb"
+								"67cb5fe95abf771e2bf52e9c"
 							]
 						}
 					},
@@ -1048,13 +1048,13 @@
 						"method": "DELETE",
 						"header": [],
 						"url": {
-							"raw": "{{url}}/books/67c45626f408b1a906e241eb",
+							"raw": "{{url}}/books/67c45e65687397ab012f1ad6",
 							"host": [
 								"{{url}}"
 							],
 							"path": [
 								"books",
-								"67c45626f408b1a906e241eb"
+								"67c45e65687397ab012f1ad6"
 							]
 						}
 					},
@@ -1066,35 +1066,22 @@
 						"method": "PATCH",
 						"header": [],
 						"body": {
-							"mode": "formdata",
-							"formdata": [
-								{
-									"key": "title",
-									"value": "Algorithms",
-									"type": "text"
-								},
-								{
-									"key": "coverImage",
-									"type": "file",
-									"src": "/D:/ITI/HTML5/Css3/Css3/imagesTask/imagesTask/grass.png",
-									"disabled": true
-								},
-								{
-									"key": "image",
-									"value": "lll",
-									"type": "text",
-									"disabled": true
+							"mode": "raw",
+							"raw": "{\n    \"title\" :\"math\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
 								}
-							]
+							}
 						},
 						"url": {
-							"raw": "{{url}}/books/67c45626f408b1a906e241eb",
+							"raw": "{{url}}/books/67c4b987277292d526b57cda",
 							"host": [
 								"{{url}}"
 							],
 							"path": [
 								"books",
-								"67c45626f408b1a906e241eb"
+								"67c4b987277292d526b57cda"
 							]
 						}
 					},
