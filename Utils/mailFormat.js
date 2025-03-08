@@ -32,7 +32,7 @@ exports.getWelcomeMessage = (user) => {
                 <p>You can log in and start exploring our platform:</p>
                 <p style="text-align:center;">
                   <a href= ${
-                    process.env.HOSTNAME
+                    process.env.BASH_HOSTNAME
                   }/auth/login  style="background:#004aad; color:#ffffff; text-decoration:none; padding:12px 20px; font-size:16px; border-radius:5px; display:inline-block; font-weight:bold;">Log In to Your Account</a>
                 </p>
                 <p>If you have any questions, feel free to contact our support team at <a href="mailto:sallma.yasser.abdulla@gmail.com" style="color:#004aad;">sallma.yasser.abdulla@gmail.com</a>.</p>
@@ -115,7 +115,7 @@ exports.getReceiptEmail = (user, order) => {
             }" style="color: #004aad; text-decoration: none;">Contact Support</a></p>
 
             <p style="text-align: center;">
-                <a href="${process.env.HOSTNAME}/orders/${order._id}" 
+                <a href="${process.env.BASH_HOSTNAME}/orders/${order._id}" 
                    style="display: inline-block; background: #004aad; color: white; padding: 10px 15px; text-decoration: none; border-radius: 5px;">View Order Details</a>
             </p>
 

@@ -2,7 +2,7 @@ const { io } = require("socket.io-client");
 const dotenv = require("dotenv");
 dotenv.config({ path: "config.env" });
 // Replace with your actual server URL
-const SOCKET_SERVER_URL = `${process.env.HOSTNAME}:${process.env.PORT}`;
+const SOCKET_SERVER_URL = `${process.env.BASH_HOSTNAME}:${process.env.PORT}`;
 
 console.log(`🌍 Connecting to Socket Server at: ${SOCKET_SERVER_URL}`);
 
