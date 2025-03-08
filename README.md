@@ -18,6 +18,7 @@ The **Online Bookstore** is a web-based e-commerce platform where users can brow
 - 🔔 **Real-Time Notifications**: WebSockets notify admins when a new order is placed.
 - 📩 **Email Notifications**: Send automated emails when users register, place an order, or when order status changes.
 - 📜 **Application Logging**: Log system states and events using Winston & Morgan.
+
 ---
 
 ## 🛠️ Technologies Used
@@ -55,11 +56,25 @@ npm install
 | Command              | Description                                               |
 | -------------------- | --------------------------------------------------------- |
 | `npm run start:dev`  | Runs in development mode 🔧 (auto-restarts with nodemon). |
-| `npm run start:prod` | Runs in production mode 🚀 with `{HOSTNAME}`.             |
+| `npm run start:prod` | Runs in production mode 🚀 .                              |
 | `npm run lint`       | Checks for code quality issues.🛡️                         |
 | `npm run fix`        | Fixes linting issues automatically.🔄                     |
 | `npm run connect `   | to run the admin web socket as client                     |
 
+## 💳 Testing Payments
+
+To simulate different payment scenarios, use the following test card numbers:
+
+- **Successful Payment:** `4242 4242 4242 4242`
+- **Payment Requires Authentication:** `4000 0025 0000 3155`
+- **Payment Declined:** `4000 0000 0000 9995`
+
+📌 **Note:**
+
+- Use any future expiration date (e.g., `12/34`).
+- Use any 3-digit CVC (e.g., `123`).
+
+These test cards work only in **Stripe's test mode** and cannot be used for real transactions.
 
 ## Deployment
 
