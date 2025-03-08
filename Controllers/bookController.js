@@ -4,6 +4,8 @@ const asyncHandler = require("express-async-handler");
 const ApiError = require("../Utils/apiError");
 const multer = require("multer");
 const path = require("path");
+const {uploadImage , deleteImage} = require("../Utils/imageService");
+const fs = require("fs");
 
 
 
@@ -18,6 +20,7 @@ const storage = multer.diskStorage({
         cb(null, uniqueSuffix)
     }
 })
+
 const multerFilter = (req, file, cb) => {
     if (file.mimetype.startsWith('image/')) {
         cb(null, true);
@@ -52,15 +55,19 @@ exports.getBooks = asyncHandler(async (req, res, next) => {
 
 exports.createBook = asyncHandler(async (req, res, next) => {
 
+    const imagePath = path.resolve(req.file.path);
+    const imageURL = await uploadImage(imagePath);
+ 
     const book = await Books.create({
         title: req.body.title,
         author: req.body.author,
         price: req.body.price,
         stock: req.body.stock,
-        coverImage: req.file.filename,
+        imageURL: imageURL.url,
         image: req.file.filename,
         description: req.body.description,
     })
+
 
     // Invalidate cached book list
     await redisClient.del("books");
@@ -83,6 +90,12 @@ exports.deleteBook = asyncHandler(async (req, res, next) => {
         next(new ApiError("No book found with that ID", 404));
         return;
     }
+   
+    await deleteImage(book.image.substring(0,book.image.lastIndexOf('.')));
+
+
+    fs.unlinkSync(path.join(__dirname,"..","bookCovers",book.image ));
+
   
     await redisClient.del("books");
     
