@@ -79,7 +79,7 @@ These test cards work only in **Stripe's test mode** and cannot be used for real
 
 ## Deployment
 
-🚀 The application is deployed on aws ec2 with Ip: (http://3.90.67.177:3000/)
+🚀 The application is deployed on aws ec2 with Ip: (http://3.82.188.98:3000/)
 
 ## 📊 Entity Relationship Diagram (ERD)
 
